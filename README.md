@@ -2,14 +2,15 @@
 
 品牌：维克托的星隐 / VIKTOR · VEILED STAR。V 标记 + 星点 + 轨道弧线（STAR GOLD `#E6C17E` / MIDNIGHT `#0B1119`）。
 
-## 线上地址（两条线，同一份代码）
+## 线上地址
 
-| 线路 | 地址 | 直连实测 |
+| 线路 | 地址 | 状态 |
 |---|---|---|
-| GitHub Pages（主） | https://clover-9.github.io/ | 200，1.4s |
-| Cloudflare Pages（备，国内更稳） | https://viktor-hub.pages.dev/ | 200，0.47s |
+| Cloudflare Pages（唯一主站） | https://viktor-hub.pages.dev/ | ✅ 200，直连 0.47s |
+| ~~GitHub Pages~~ | ~~clover-9.github.io~~ | ❌ 已下线：仓库转 Private 后免费账号不能开 Pages |
 
-两份内容完全一致，哪条被墙/变慢就换另一条贴。
+代码仓库 `clover-9/clover-9.github.io` 已设为 **Private**，只作版本管理，不再对外提供站点。
+站点走 `wrangler pages deploy` 直接上传，不依赖 GitHub 构建，所以私有仓库不影响发布。
 
 ## 短链
 
@@ -92,11 +93,11 @@ window.SITE = {
 ## 发布
 
 ```bash
-# GitHub Pages（推了就自动构建，约 30~60 秒）
-git add -A && git commit -m "update" && git push
+# 站点（唯一发布路径：同步 dist + 部署 Pages）
+powershell -File scripts/deploy-pages.ps1
 
-# Cloudflare Pages（同步 dist + 部署）
-pwsh -File scripts/deploy-pages.ps1
+# 代码版本管理（私有仓库，不影响站点）
+git add -A && git commit -m "update" && git push
 
 # Worker 版短链
 npx wrangler deploy
@@ -107,9 +108,11 @@ npx wrangler kv key put --binding=LINKS --remote "tg02" "https://viktor-hub.page
 
 ## 已知的坑
 
-1. **`workers.dev` 国内直连不通**（实测 TCP 失败），所以短链先走 `pages.dev`；要贴到平台评论区，最终还是要自有域名。
-2. **GitHub Pages 设不了响应头**，出不了 302，壳页只能客户端跳转——这反而成了最好的伪装。
-3. **一律 302**，301 会被浏览器和 CDN 长期缓存，改目标后老访客还跳旧地址。
-4. **`waves.webp` 必须上传**，否则亮色主题缺底图。
-5. **Pages 不认自定义 wrangler 配置路径**，所以 Pages 单独一个子目录。
-6. 渠道码别加在 `mqqapi://` 上，脚本已做 scheme 白名单。
+1. **免费账号的 Private 仓库不能开 GitHub Pages**（Pages 需要 Public 仓库，Private 要 Pro $4/月）。所以仓库转 Private 后 GitHub 那条线已经下线，站点只跑 Cloudflare Pages。
+2. **仓库改名拿不到 `v.github.io`**。GitHub 用户站点域名的格式是 `<你的用户名>.github.io`，仓库名叫 `v.github.io` 只会变成项目页 `clover-9.github.io/v.github.io/`，而 `v.github.io` 属于另一个叫 `v` 的账号。
+3. **`workers.dev` 国内直连不通**（实测 TCP 失败），短链先走 `pages.dev`；要贴到平台评论区，最终还是要自有域名。
+4. **GitHub Pages 设不了响应头**，出不了 302，壳页只能客户端跳转。
+5. **一律 302**，301 会被浏览器和 CDN 长期缓存，改目标后老访客还跳旧地址。
+6. **`waves.webp` 必须上传**，否则亮色主题缺底图。
+7. **Pages 不认自定义 wrangler 配置路径**，所以 Pages 单独一个子目录。
+8. 渠道码别加在 `mqqapi://` 和 QQ 群分享链接上，脚本已做白名单跳过。
