@@ -135,6 +135,18 @@ export const onRequest = async (ctx) => {
     return Response.redirect(qs ? target + (target.includes('?') ? '&' : '?') + qs : target, 302);
   }
 
+  // 极短码（KV 里的 link:<code>）：评论区用的就是这种
+  //   https://vktxy.com/a1  → 302 → https://vktxy.com/?ch=a1
+  if (/^[a-z0-9]{1,6}$/i.test(code) && ctx.env.STATS) {
+    const k = code.toLowerCase();
+    const dst = await ctx.env.STATS.get(`link:${k}`);
+    if (dst) {
+      ctx.waitUntil(bump(ctx.env, `c:${today()}:${k}`));   // 点击按短码本身归因
+      const qs = url.search.slice(1);
+      return Response.redirect(qs ? dst + (dst.includes('?') ? '&' : '?') + qs : dst, 302);
+    }
+  }
+
   // 落地页访问（只有根路径算一次访问）
   if (code === '') {
     ctx.waitUntil(bump(ctx.env, `v:${today()}:${channelOf(url)}`));

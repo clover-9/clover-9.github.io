@@ -103,6 +103,30 @@ c:2026-11-15:800     当日短链点击，渠道 800
 
 KV 没有原子自增，高并发下会丢少量计数（读-改-写），做渠道对比完全够用。
 
+## 评论区用的极短链
+
+最短路形态：**`https://vktxy.com/a1`**（20 字符），没有子域、没有 query。
+
+```
+https://vktxy.com/a1   → 302 → https://vktxy.com/?ch=a1
+```
+
+短码存在 KV 的 `link:<code>`，随时能加、能换目标、能删，不用重新部署。
+
+| 操作 | 命令 |
+|---|---|
+| 新增 | `powershell -File scripts\new-link.ps1 -Code a4` |
+| 指定渠道 | `powershell -File scripts\new-link.ps1 -Code a5 -Channel 视频5` |
+| 指向别的页面 | `powershell -File scripts\new-link.ps1 -Code f1 -Target "https://vktxy.com/film"` |
+| 改目标 | 同一个 code 再跑一次，覆盖 |
+| 删除 | `npx wrangler kv key delete --binding=LINKS --remote link:a4` |
+
+规则：1~6 位 `[a-z0-9]`。**点击和访问都会按短码本身归因**，所以 `/stats` 里每个码单独一行，能直接对比「哪条视频/哪个群带来的量」。
+
+当前已建：`a1` `a2` `a3` `v1` `v2`。
+
+> 长度下限由域名决定：`vktxy.com/` 占 10 个字符，短码再短也压不下多少。想更短只能换更短的域名（如 4~6 字符的 `.com`）。
+
 ## 发布
 
 ```bash
