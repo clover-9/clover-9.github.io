@@ -9,10 +9,11 @@ compatibility_date = "2026-11-15"
 binding = "LINKS"
 id = "1b7f853a7519412f8fa9dc94f727c9c3"
 
-# 自定义域：在 Workers → Triggers → Custom Domains 里绑 s.你的域名.com
-# 也可以在这里声明（需要域名已经在同一 Cloudflare 账号下）
+# 自定义域：绑好后短链就是 https://s.<你的域名>/*
+# 买了域名之后把下面三行取消注释、改成实际域名，再 npx wrangler deploy 即可自动签发证书
+# （或者直接跑 scripts\bind-domain.ps1 -Domain <你的域名>，它连 Pages 域名和 SSL 一起配好）
 # routes = [
-#   { pattern = "s.你的域名.com/*", custom_domain = true }
+#   { pattern = "s.vktxy.top/*", custom_domain = true }
 # ]
 
 [observability]
