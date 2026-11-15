@@ -78,6 +78,31 @@ https://vktxy.com/?ch=wx     → ?from=wx
 
 只作用于 `http(s)`；`mqqapi://` 和 `qun.qq.com` 分享链接会被跳过（带签名，不能加参数）。
 
+## 访问统计（私有）
+
+```
+https://vktxy.com/stats?key=<口令>
+```
+
+- 口令存在 KV 的 `admin:stats_key`，不在代码里、不在本仓库里（仓库是 Public）。取法：
+  `npx wrangler kv key get --binding=LINKS --remote admin:stats_key`
+- 换口令：`npx wrangler kv key put --binding=LINKS --remote admin:stats_key <新口令>`
+- 不带 key 或 key 不对 → 返回和普通 404 完全一样的响应，外人看不出这个路径存在
+
+计数 key（同一个 KV 命名空间）：
+
+```
+v:2026-11-15:800     当日落地页访问，渠道 800（来自 ?S800 / ?from=800）
+c:2026-11-15:800     当日短链点击，渠道 800
+```
+
+| 指标 | 含义 | 记录点 |
+|---|---|---|
+| 访问 | 落地页（`/`）被打开 | Pages Functions |
+| 点击 | 短链（`/s`、`/film`…）被点 | Pages Functions + Worker |
+
+KV 没有原子自增，高并发下会丢少量计数（读-改-写），做渠道对比完全够用。
+
 ## 发布
 
 ```bash

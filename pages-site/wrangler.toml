@@ -1,3 +1,8 @@
-﻿name = "viktor-hub"
+name = "viktor-hub"
 pages_build_output_dir = "dist"
 compatibility_date = "2026-11-15"
+
+# 统计用 KV（与 Worker 的 LINKS 是同一个命名空间，只是绑定名不同）
+[[kv_namespaces]]
+binding = "STATS"
+id = "1b7f853a7519412f8fa9dc94f727c9c3"

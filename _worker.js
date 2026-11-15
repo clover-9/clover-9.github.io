@@ -23,8 +23,30 @@ const TABLE = {
 
 const NOT_FOUND = '{"code":-404,"message":"啥都木有"}';
 
+// ---- 统计（与 Pages Functions 共用同一个 KV 命名空间）----
+const today = () => new Date().toISOString().slice(0, 10);
+
+function channelOf(url) {
+  const q = url.searchParams;
+  let ch = q.get('from') || q.get('ch') || q.get('S') || q.get('s');
+  if (!ch) {
+    for (const [k] of q) {
+      if (/^[Ss][0-9A-Za-z]{1,12}$/.test(k)) { ch = k.slice(1); break; }
+    }
+  }
+  return (ch || 'direct').slice(0, 24);
+}
+
+async function bump(env, key) {
+  if (!env.LINKS) return;
+  try {
+    const cur = parseInt((await env.LINKS.get(key)) || '0', 10);
+    await env.LINKS.put(key, String(cur + 1));
+  } catch (e) { /* KV 写限流，忽略 */ }
+}
+
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url  = new URL(request.url);
     const code = url.pathname.replace(/^\/+/, '').split('/')[0];
     const ua   = request.headers.get('user-agent') || '';
@@ -50,6 +72,9 @@ export default {
     // 渠道码透传：?S800 / ?from=xxx 原样带到落地页
     const params = url.search.slice(1);           // 去掉 "?"
     const dest = params ? target + (target.includes('?') ? '&' : '?') + params : target;
+
+    // 记一次点击（异步，不阻塞跳转）
+    if (ctx && ctx.waitUntil) ctx.waitUntil(bump(env, `c:${today()}:${channelOf(url)}`));
 
     // 一定是 302：301 会被浏览器和 CDN 长期缓存，改了目标用户还在跳旧地址
     return Response.redirect(dest, 302);

@@ -1,11 +1,20 @@
 /**
- * Cloudflare Pages Functions —— 短链 + www 规范化
+ * Cloudflare Pages Functions —— 短链 + www 规范化 + 私有统计
  *
- * 正式域名：vktxy.com
- *   https://vktxy.com/s?S800      → 302 → https://vktxy.com/?S800
- *   https://www.vktxy.com/xxx     → 301 → https://vktxy.com/xxx
+ * 公开行为：
+ *   https://vktxy.com/xxx          → 落地页（静态）
+ *   https://vktxy.com/s?S800       → 302 → https://vktxy.com/?S800
+ *   https://www.vktxy.com/xxx      → 301 → https://vktxy.com/xxx
+ *   https://vktxy.com/nope         → 404
  *
- * 静态资源优先：TABLE 里没有的路径一律 next()，交给 dist 里的文件。
+ * 私有行为（只有拿到 key 的人能看）：
+ *   https://vktxy.com/stats?key=XXX → 统计页
+ *   没带 key 或 key 不对 → 和普通 404 一模一样
+ *
+ * 计数存在 KV（binding STATS）：
+ *   v:2026-11-15:800   当日落地页访问（渠道 800）
+ *   c:2026-11-15:800   当日短链点击（渠道 800）
+ *   admin:stats_key    访问统计页的口令
  */
 
 const BASE = 'https://vktxy.com/';
@@ -18,29 +27,122 @@ const TABLE = {
   pan:   BASE + '?ch=pan',
 };
 
+// ---------- 工具 ----------
+const today = () => new Date().toISOString().slice(0, 10);
+
+function channelOf(url) {
+  const q = url.searchParams;
+  let ch = q.get('from') || q.get('ch') || q.get('S') || q.get('s');
+  if (!ch) {
+    // ?S800 这种不带等号的写法，遍历 key 找 S数字
+    for (const [k] of q) {
+      if (/^[Ss][0-9A-Za-z]{1,12}$/.test(k)) { ch = k.slice(1); break; }
+    }
+  }
+  return (ch || 'direct').slice(0, 24);
+}
+
+async function bump(env, key) {
+  if (!env.STATS) return;
+  try {
+    const cur = parseInt((await env.STATS.get(key)) || '0', 10);
+    await env.STATS.put(key, String(cur + 1));
+  } catch (e) { /* KV 写限流，忽略 */ }
+}
+
+const notFound = () => new Response('404 Not Found', {
+  status: 404,
+  headers: { 'content-type': 'text/plain; charset=utf-8' },
+});
+
+// ---------- 统计页 ----------
+async function statsPage(env, days = 7) {
+  const list = await env.STATS.list({ prefix: '' });
+  const rows = list.keys
+    .map((k) => k.name)
+    .filter((n) => /^[vc]:\d{4}-\d{2}-\d{2}:/.test(n));
+
+  const data = {};
+  for (const k of rows) {
+    const m = k.match(/^([vc]):(\d{4}-\d{2}-\d{2}):(.*)$/);
+    if (!m) continue;
+    const [, kind, d, ch] = m;
+    const n = parseInt((await env.STATS.get(k)) || '0', 10);
+    data[d] = data[d] || {};
+    data[d][ch] = data[d][ch] || { v: 0, c: 0 };
+    if (kind === 'v') data[d][ch].v += n; else data[d][ch].c += n;
+  }
+
+  const dates = Object.keys(data).sort().reverse().slice(0, days);
+  let body = '';
+  for (const d of dates) {
+    const chs = Object.keys(data[d]).sort();
+    const sumV = chs.reduce((a, c) => a + data[d][c].v, 0);
+    const sumC = chs.reduce((a, c) => a + data[d][c].c, 0);
+    body += `<tr class="day"><td>${d}</td><td>${sumV}</td><td>${sumC}</td><td>合计</td></tr>`;
+    for (const ch of chs) {
+      const r = data[d][ch];
+      body += `<tr><td>${d}</td><td>${r.v}</td><td>${r.c}</td><td>${ch}</td></tr>`;
+    }
+  }
+  if (!body) body = '<tr><td colspan="4" class="empty">还没有数据</td></tr>';
+
+  return new Response(`<!doctype html><html lang="zh-CN"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>统计</title>
+<style>
+ body{background:#07080f;color:#eef0ff;font:14px/1.6 -apple-system,"Microsoft YaHei",sans-serif;padding:24px}
+ h1{font-size:18px;margin:0 0 4px}p{color:#8b90b5;margin:0 0 20px;font-size:12px}
+ table{border-collapse:collapse;width:100%;max-width:760px}
+ th,td{padding:8px 10px;text-align:left;border-bottom:1px solid rgba(255,255,255,.08);font-variant-numeric:tabular-nums}
+ th{color:#8b90b5;font-weight:500;font-size:12px}
+ tr.day td{background:rgba(34,211,238,.06);font-weight:600}
+ td.empty{color:#8b90b5;text-align:center;padding:32px}
+</style></head><body>
+<h1>维克托 · 访问统计</h1>
+<p>访问 = 落地页打开次数 · 点击 = 短链被点次数 · 渠道来自 ?S800 / ?from= / ?ch=</p>
+<table><thead><tr><th>日期</th><th>访问</th><th>点击</th><th>渠道</th></tr></thead>
+<tbody>${body}</tbody></table>
+</body></html>`, { headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' } });
+}
+
+// ---------- 入口 ----------
 export const onRequest = async (ctx) => {
   const url = new URL(ctx.request.url);
 
-  // www → 根域（301，永久，避免重复收录）
+  // www → 根域
   if (url.hostname === `www.${APEX}`) {
-    const dest = new URL(url.pathname + url.search, BASE);
-    return Response.redirect(dest.toString(), 301);
+    return Response.redirect(new URL(url.pathname + url.search, BASE).toString(), 301);
   }
 
   const code = url.pathname.replace(/^\/+/, '').replace(/\/$/, '');
-  const target = TABLE[code];
-  if (!target) {
-    // 带扩展名的交给静态资源（icon-32.png、waves.webp…）
-    if (code === '' || /\.[a-z0-9]{2,5}$/i.test(code)) return ctx.next();
-    // 其余当作不存在的短码，直接 404
-    return new Response('404 Not Found', {
-      status: 404,
-      headers: { 'content-type': 'text/plain; charset=utf-8' },
-    });
+
+  // 私有统计页
+  if (code === 'stats') {
+    if (!ctx.env.STATS) return notFound();
+    const given = url.searchParams.get('key') || '';
+    const real = await ctx.env.STATS.get('admin:stats_key');
+    if (!real || given !== real) return notFound();
+    return statsPage(ctx.env, 7);
   }
 
-  const qs = url.search.slice(1);
-  const dest = qs ? target + (target.includes('?') ? '&' : '?') + qs : target;
+  // 短链
+  const target = TABLE[code];
+  if (target) {
+    const ch = channelOf(url);
+    ctx.waitUntil(bump(ctx.env, `c:${today()}:${ch}`));
+    const qs = url.search.slice(1);
+    return Response.redirect(qs ? target + (target.includes('?') ? '&' : '?') + qs : target, 302);
+  }
 
-  return Response.redirect(dest, 302);
+  // 落地页访问（只有根路径算一次访问）
+  if (code === '') {
+    ctx.waitUntil(bump(ctx.env, `v:${today()}:${channelOf(url)}`));
+    return ctx.next();
+  }
+
+  // 静态资源优先
+  if (/\.[a-z0-9]{2,5}$/i.test(code)) return ctx.next();
+
+  return notFound();
 };
