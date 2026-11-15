@@ -24,6 +24,10 @@
      改完保存（或在 GitHub 网页上提交），刷新页面即可生效。
      ============================================================ -->
 <script>
+// QQ 群「分享群 → 复制链接」得到的官方邀请页（手机拉起 QQ，桌面直接显示群资料卡可申请加群）
+// 注意：链接里的 authKey / data 是签名参数，失效了重新复制一条替换即可
+var QQ_GROUP = 'https://qun.qq.com/universal-share/share?ac=1&authKey=I0ySQJ%2B2UJ%2Fio28LDE7S4uiKgHlUNdgLBFoW6riJGxKkt2W9U14VO78K0zIR4N6f&busi_data=eyJncm91cENvZGUiOiIxMTI1MjY2Mjg4IiwidG9rZW4iOiI1TXJMTUdpeDRPZmxXTTlyWERlTGlIdGU5cHo2clRMZS9vMlJWcU96a2w1aWVlT0NRSkVLR1A3NkdTMDR4cHBFIiwidWluIjoiMjE4NzE3MTYxMSJ9&data=KP55jhyOXE_pi6vJEUgj35WCVs3827qCPSg58b1UzM0RB4G_p_Fb3qNuXT_KQ9Jd00mWAV_AHxGvouMfsXzAdQ&svctype=4&tempid=h5_group_info';
+
 window.SITE = {
   title:    '维克托 · 资源合集',                          // 浏览器标签页标题
   badge:    '资源站运行中',                              // 顶部小圆点徽章
@@ -43,9 +47,8 @@ window.SITE = {
       href:  'https://viktorx.com/',                    // ← 改成你的影视站
       tags: [{ t: '推荐', c: 'r' }, { t: '每日更新', c: 'v opt' }] },
 
-    { title: '企鹅粉丝群', note: '群号 1125266288 · 交流互助',
-      // 手机点开直接拉起 QQ 群资料卡；桌面/拉不起时走 HTML 里的 data-fallback
-      href:  'mqqapi://card/show_pslcard?src_type=internal&version=1&uin=1125266288&card_type=group&source=qrcode',
+    { title: '企鹅粉丝群', note: '群号 1125266288 · 10T 资源免费分享',
+      href:  QQ_GROUP,
       tags: [{ t: '交流', c: 'v' }] },
 
     { title: '限时|网盘点此免费获得1TB容量', note: '新用户专享 · 限时领取',
@@ -408,8 +411,8 @@ window.SITE = {
 
     <div class="sec" data-slot="group1">资源频道</div>
 
-    <a class="item" style="animation-delay:.08s" href="mqqapi://card/show_pslcard?src_type=internal&version=1&uin=1125266288&card_type=group&source=qrcode"
-       data-fallback="https://qun.qq.com/joinGroup.html?gc=1125266288" data-fallback-text="请在手机上打开，或搜索群号 1125266288 加群">
+    <a class="item" style="animation-delay:.08s" href="https://qun.qq.com/universal-share/share?ac=1&amp;authKey=I0ySQJ%2B2UJ%2Fio28LDE7S4uiKgHlUNdgLBFoW6riJGxKkt2W9U14VO78K0zIR4N6f&amp;busi_data=eyJncm91cENvZGUiOiIxMTI1MjY2Mjg4IiwidG9rZW4iOiI1TXJMTUdpeDRPZmxXTTlyWERlTGlIdGU5cHo2clRMZS9vMlJWcU96a2w1aWVlT0NRSkVLR1A3NkdTMDR4cHBFIiwidWluIjoiMjE4NzE3MTYxMSJ9&amp;data=KP55jhyOXE_pi6vJEUgj35WCVs3827qCPSg58b1UzM0RB4G_p_Fb3qNuXT_KQ9Jd00mWAV_AHxGvouMfsXzAdQ&amp;svctype=4&amp;tempid=h5_group_info">
+
       <span class="ava g3" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
           <path d="M20 12.6c0 3.5-3.6 6.3-8 6.3a9.7 9.7 0 0 1-2.6-.35L5 20.5l.8-3.1A6 6 0 0 1 4 12.6C4 9.1 7.6 6.3 12 6.3s8 2.8 8 6.3z"></path>
@@ -418,7 +421,7 @@ window.SITE = {
       </span>
       <span class="info">
         <span class="trow"><span class="title">企鹅粉丝群</span><span class="pill v">交流</span></span>
-        <span class="note">群号 1125266288 · 交流互助</span>
+        <span class="note">群号 1125266288 · 10T 资源免费分享</span>
       </span>
       <span class="go-btn">前往</span>
     </a>
@@ -526,6 +529,7 @@ window.SITE = {
     try {
       var raw = items[i].getAttribute('href') || '';
       if (!/^https?:/i.test(raw)) continue;          // mqqapi 之类的 scheme 不追加参数
+      if (/qun\.qq\.com|qm\.qq\.com/i.test(raw)) continue;  // QQ 群分享链接带签名，不能加参数
       var u = new URL(raw, location.href);
       u.searchParams.set('from', from);
       items[i].setAttribute('href', u.href);
