@@ -1,0 +1,5 @@
+# 构建产物与本地缓存，不进仓库
+pages-site/dist/
+node_modules/
+.wrangler/
+dist/

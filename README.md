@@ -1,50 +1,75 @@
-# 维克托 · 资源合集 — 落地页
+# 维克托 · 资源合集 — 双线路落地页
 
-线上地址：**https://clover-9.github.io/**（GitHub Pages，仓库 `clover-9/clover-9.github.io`）
+品牌：维克托的星隐 / VIKTOR · VEILED STAR。V 标记 + 星点 + 轨道弧线（STAR GOLD `#E6C17E` / MIDNIGHT `#0B1119`）。
 
-品牌：维克托的星隐 / VIKTOR · VEILED STAR。图标为 V 标记 + 星点 + 轨道弧线（STAR GOLD `#E6C17E` / MIDNIGHT `#0B1119`）。
+## 线上地址（两条线，同一份代码）
 
-## 结构
+| 线路 | 地址 | 直连实测 |
+|---|---|---|
+| GitHub Pages（主） | https://clover-9.github.io/ | 200，1.4s |
+| Cloudflare Pages（备，国内更稳） | https://viktor-hub.pages.dev/ | 200，0.47s |
+
+两份内容完全一致，哪条被墙/变慢就换另一条贴。
+
+## 短链
+
+| 入口 | 地址 | 状态 |
+|---|---|---|
+| Pages Functions | `https://viktor-hub.pages.dev/s` | ✅ 可用，国内直连通 |
+| Worker（KV） | `https://shortlink.huzhiquan386.workers.dev/s` | ⚠️ 功能正常，但 `workers.dev` 国内直连不通，**待绑自有域名** |
+
+已验证的跳转：
 
 ```
-短链（Cloudflare Worker）
-      ↓ 302
-clover-9.github.io        ← 本仓库：纯静态壳页
-      ↓ 点卡片
-维克托影视站 / QQ 群 / 夸克网盘
+https://viktor-hub.pages.dev/s         → 302 → https://viktor-hub.pages.dev/
+https://viktor-hub.pages.dev/s?S800    → 302 → https://viktor-hub.pages.dev/?S800
+https://viktor-hub.pages.dev/film      → 302 → https://viktor-hub.pages.dev/?ch=film
+https://viktor-hub.pages.dev/nope      → 静态资源/404（不拦）
+https://shortlink.huzhiquan386.workers.dev/tg01 → 302 → https://clover-9.github.io/?ch=tg01
 ```
 
-| 文件 | 作用 |
-|---|---|
-| `index.html` | 落地页本体，单文件、零外部依赖（不引 CDN、不引统计脚本） |
-| `waves.webp` | 亮色主题的紫色波浪底图（暗色下 `display:none` 不加载），**漏传会导致亮色变紫底紫字** |
-| `_worker.js` | Cloudflare Worker 短链网关：短码 → 302，渠道码透传 + UA/来源门控 |
-| `site.webmanifest` | PWA 清单（安卓「添加到桌面」用） |
-| `favicon.ico` `icon-16/32/48/64/180/192/512.png` | 图标全套，均已替换为 V 标记 |
-| `viktor-star-1024.png` | 分享卡（og:image）用大图 |
+**绑自有域名后**（需域名 NS 托管到 Cloudflare）：
+Workers → shortlink → Triggers → Custom Domains → `s.你的域名.com`。之后短链就是 `https://s.你的域名.com/s`。
+
+## 目录
+
+```
+pansou-link/
+├── index.html                落地页本体（单文件、零外部依赖）
+├── waves.webp                亮色主题波浪底图（漏传 → 亮色变紫底紫字）
+├── site.webmanifest          PWA 清单
+├── favicon.ico / icon-16…512 / apple-touch-icon   V 标记图标全套
+├── viktor-star-1024.png      分享卡（og:image）
+├── _worker.js                Worker 版短链（KV + 渠道码透传 + UA 门控）
+├── wrangler.toml             Worker 配置（name=shortlink, KV=LINKS）
+├── pages-site/               Cloudflare Pages 子项目
+│   ├── wrangler.toml         name=viktor-hub, pages_build_output_dir=dist
+│   ├── functions/[[path]].js 短链兜底（/s /film /group /pan）
+│   └── dist/                 部署产物（.gitignore，由脚本生成）
+├── scripts/deploy-pages.ps1  同步 dist + 部署 Pages
+└── preview-*.png             864×1200 实际渲染
+```
 
 ## 出口
 
 | 卡片 | 落点 |
 |---|---|
 | 维克托影视站 | `https://viktorx.com/` |
-| 企鹅粉丝群 | 群号 `1125266288`，`mqqapi://` 拉起 QQ + `qun.qq.com` 兜底 |
+| 企鹅粉丝群 | 群号 `1125266288`（`mqqapi://` 拉起 QQ，桌面走 `qun.qq.com` 兜底） |
 | 限时\|网盘 1TB | `https://pan.quark.cn/s/3453b4fa25f6` |
 
-**QQ 群为什么这样做**：裸群号不能当链接。卡片 `href` 用 `mqqapi://card/show_pslcard?...&uin=1125266288&card_type=group`，手机上点直接拉起群资料卡；`data-fallback` 兜底到 `qun.qq.com/joinGroup.html?gc=1125266288`，桌面点击或 scheme 拉不起来时 1.5 秒后自动跳过去。
+想桌面也能一键加群：手机 QQ → 群设置 → 分享群 → 复制链接，得到 `https://qm.qq.com/q/xxxxx`，同时填进 `href` 和 `data-fallback`。
 
-想桌面也能一键加群：手机 QQ → 群设置 → 分享群 → 复制链接，拿到 `https://qm.qq.com/q/xxxxx`，把它同时填进 `href` 和 `data-fallback` 即可（`href` 里那段 `mqqapi://` 可以删掉）。
+## 改文案
 
-## 改文案：只动一处
-
-`index.html` 顶部有 `window.SITE` 配置块，页面所有文字、卡片、标签配色都从它渲染：
+`index.html` 顶部 `window.SITE` 是唯一文案源：
 
 ```js
 window.SITE = {
-  title:    '维克托 · 资源合集',   // 标签页标题
+  title:    '维克托 · 资源合集',
   badge:    '资源站运行中',
-  brand:    '维克托资源库',        // 大标题
-  brandIcon: null,                // 已改用 SVG V 图标，留空
+  brand:    '维克托资源库',
+  brandIcon: null,                 // 已改用 SVG V 图标
   slogan:   '网盘资源 · 游戏 · 影视 · 软件 · DLC 一应俱全',
   chip:     '资源均免费分享 · 无任何套路',
   go:       '前往',
@@ -54,46 +79,37 @@ window.SITE = {
 };
 ```
 
-- `tags` 配色：`r` 紫粉渐变 / `v` 品红描边 / `n` 紫色描边；`v opt` 在窄屏自动隐藏
-- 增删卡片：同时改 `cards` 数组项 **和** 对应的 `<a class="item">` 节点
-- 换出口要改**两处**：`cards[i].href` 和 HTML 里那张卡的 `href="..."`
+换出口要改**两处**：`cards[i].href` 和 HTML 里那张卡的 `href="..."`。
 
-## 渠道码透传
-
-第一跳带上的渠道码，会由页面脚本自动拼到每个出口：
+## 渠道码
 
 ```
-https://clover-9.github.io/?S800        → 出口变成 ?from=800
-https://clover-9.github.io/?from=tg01   → ?from=tg01
-https://clover-9.github.io/?ch=wx       → ?from=wx
+?S800 → 出口 ?from=800    ?from=tg01 → ?from=tg01    ?ch=wx → ?from=wx
 ```
 
-只对 `http(s)` 链接生效，`mqqapi://` 这类 scheme 会被跳过。
+只作用于 `http(s)`，`mqqapi://` 会被跳过。
 
-## 部署与更新
+## 发布
 
 ```bash
+# GitHub Pages（推了就自动构建，约 30~60 秒）
 git add -A && git commit -m "update" && git push
+
+# Cloudflare Pages（同步 dist + 部署）
+pwsh -File scripts/deploy-pages.ps1
+
+# Worker 版短链
+npx wrangler deploy
+
+# 往 KV 加一条短码
+npx wrangler kv key put --binding=LINKS --remote "tg02" "https://viktor-hub.pages.dev/?ch=tg02"
 ```
-
-Push 后 GitHub Pages 约 30~60 秒重建。查看状态：仓库 Settings → Pages，或 `curl -sI https://clover-9.github.io/ | head -3`。
-
-## 短链层（Cloudflare Worker）
-
-```bash
-npm i -g wrangler
-wrangler login
-wrangler deploy _worker.js --name shortlink
-```
-
-然后：Workers → shortlink → Settings → 绑 KV 命名空间 `LINKS`；Triggers → Custom Domains 绑 `s.你的域名.com`。
-
-`_worker.js` 里的 `TABLE` 已经是占位，把 `https://your-name.github.io/link/` 换成 `https://clover-9.github.io/` 即可；量大就改用 KV，后台随时增删不用重新部署。
 
 ## 已知的坑
 
-1. **GitHub Pages 设不了 HTTP 响应头**，出不了 302，所以壳页只能靠 HTML/JS 跳转——这反而成了最好的伪装。
-2. **一律用 302，别用 301**。301 会被浏览器和 CDN 长期缓存，改了目标老访客还在跳旧地址。
-3. **`waves.webp` 必须上传**，否则亮色主题缺底图。
-4. **`file://` 下 localStorage 可能被拦**，主题切换会退回默认暗色，属正常。
-5. **渠道码别加在 `mqqapi://` 上**，脚本已做 scheme 白名单。
+1. **`workers.dev` 国内直连不通**（实测 TCP 失败），所以短链先走 `pages.dev`；要贴到平台评论区，最终还是要自有域名。
+2. **GitHub Pages 设不了响应头**，出不了 302，壳页只能客户端跳转——这反而成了最好的伪装。
+3. **一律 302**，301 会被浏览器和 CDN 长期缓存，改目标后老访客还跳旧地址。
+4. **`waves.webp` 必须上传**，否则亮色主题缺底图。
+5. **Pages 不认自定义 wrangler 配置路径**，所以 Pages 单独一个子目录。
+6. 渠道码别加在 `mqqapi://` 上，脚本已做 scheme 白名单。
