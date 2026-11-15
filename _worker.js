@@ -11,10 +11,10 @@
 
 // ── 方式 A：内置映射表（改代码即生效，适合十几条以内）────────────────
 const TABLE = {
-  // 短码 → 落地页。落地页已在 GitHub Pages 上线：https://clover-9.github.io/
-  's':      'https://clover-9.github.io/',
-  'film':   'https://clover-9.github.io/?ch=film',
-  'group':  'https://clover-9.github.io/?ch=group',
+  // 短码 → 落地页。正式域名：https://vktxy.com/
+  's':      'https://vktxy.com/',
+  'film':   'https://vktxy.com/?ch=film',
+  'group':  'https://vktxy.com/?ch=group',
 };
 
 // ── 方式 B：KV（适合成百上千条，后台随时增删，不用重新部署）──────────
