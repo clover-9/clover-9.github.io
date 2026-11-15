@@ -1,0 +1,14 @@
+{
+  "name": "维克托 · 资源合集",
+  "short_name": "维克托资源",
+  "description": "网盘资源 · 游戏 · 影视 · 软件 · DLC 一应俱全",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#07080f",
+  "theme_color": "#07080f",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}
