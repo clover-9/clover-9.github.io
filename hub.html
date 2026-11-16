@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>维克托 · 总站链接</title>
+<meta name="theme-color" content="#f5f5f7">
+<meta property="og:type" content="website">
+<meta property="og:title" content="维克托 · 总站链接">
+<meta property="og:description" content="收集全网资源，想要什么都有，没有的反馈帮找">
+<meta property="og:image" content="https://vktxy.com/viktor-star-1024.png">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="icon-32.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<style>
+  :root{
+    --bg:#f2f3f5;
+    --card:#fff;
+    --line:rgba(0,0,0,.06);
+    --txt:#1a1a1a;
+    --dim:#8a8f99;
+    --dim2:#a8adb6;
+    --accent:#7c5cff;
+    --accent2:#b18cff;
+    --radius:16px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+    background:var(--bg);color:var(--txt);
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:calc(40px + env(safe-area-inset-bottom));
+  }
+  .wrap{max-width:680px;margin:0 auto;padding:0 14px}
+
+  /* ===== 顶栏 ===== */
+  .topbar{
+    position:sticky;top:0;z-index:20;
+    background:rgba(242,243,245,.86);
+    backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+    border-bottom:1px solid var(--line);
+  }
+  .topbar .wrap{display:flex;align-items:center;gap:10px;height:52px}
+  .logo{
+    width:26px;height:26px;border-radius:8px;flex:none;
+    background:linear-gradient(160deg,#18232d,#050c14);
+    display:grid;place-items:center;
+  }
+  .logo svg{width:18px;height:18px;display:block}
+  .topbar h1{font-size:15px;font-weight:600;letter-spacing:.2px}
+  .topbar .tag{
+    font-size:10px;color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent2));
+    padding:2px 7px;border-radius:99px;font-weight:500;letter-spacing:.3px;
+  }
+  .topbar .spacer{flex:1}
+  .copy-btn{
+    font-size:12px;color:var(--accent);background:rgba(124,92,255,.08);
+    border:1px solid rgba(124,92,255,.18);padding:5px 11px;border-radius:99px;
+    font-family:inherit;font-weight:500;
+  }
+
+  /* ===== 头图 ===== */
+  .hero{
+    margin-top:12px;border-radius:var(--radius);overflow:hidden;position:relative;
+    padding:34px 22px 30px;color:#2a2140;
+    background:
+      radial-gradient(circle at 92% 8%,#ffffff 0%,transparent 52%),
+      radial-gradient(circle at 6% 96%,#dbeafe 0%,transparent 54%),
+      linear-gradient(135deg,#ede7ff 0%,#f6f2ff 46%,#eaf1ff 100%);
+    border:1px solid rgba(124,92,255,.10);
+  }
+  .hero h2{font-size:23px;line-height:1.55;font-weight:700;letter-spacing:.2px;margin-bottom:14px;color:#221a38}
+  .hero p{font-size:11.5px;line-height:1.9;color:#6b6480;word-break:break-word}
+  .hero .more{
+    display:inline-block;margin-top:8px;font-size:11.5px;color:#7c5cff;
+    border-bottom:1px solid rgba(124,92,255,.4);
+  }
+
+  /* ===== 卡片通用 ===== */
+  .card{background:var(--card);border-radius:var(--radius);margin-top:14px;padding:22px 20px 8px;box-shadow:0 1px 2px rgba(20,20,40,.04)}
+  .card h3{font-size:17px;font-weight:600;letter-spacing:.3px;margin-bottom:18px}
+
+  /* ===== 操作入口 ===== */
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px 4px;padding-bottom:12px}
+  @media(max-width:360px){ .grid{grid-template-columns:repeat(3,1fr)} }
+  .entry{
+    display:flex;flex-direction:column;align-items:center;gap:9px;
+    padding:8px 2px 12px;border-radius:12px;text-decoration:none;color:var(--txt);
+    transition:background .15s;position:relative;
+  }
+  .entry:active{background:rgba(0,0,0,.03)}
+  .entry .ico{
+    width:46px;height:46px;border-radius:13px;display:grid;place-items:center;
+    background:#5b6472;color:#fff;box-shadow:0 3px 8px rgba(30,40,60,.16);
+  }
+  .entry .ico svg{width:23px;height:23px}
+  .entry .ico.p{background:linear-gradient(135deg,#8b5cf6,#a855f7);box-shadow:0 3px 10px rgba(139,92,246,.32)}
+  .entry .ico.b{background:linear-gradient(135deg,#6b7280,#9ca3af);box-shadow:0 3px 8px rgba(80,90,110,.2)}
+  .entry .ico.g{background:linear-gradient(135deg,#8b5cf6,#a855f7);box-shadow:0 3px 10px rgba(139,92,246,.3)}
+  .entry .lb{font-size:11.5px;line-height:1.35;color:#3c4149;text-align:center;letter-spacing:.1px}
+  .entry .rec{
+    position:absolute;top:2px;right:50%;transform:translate(34px,0);
+    font-size:9px;color:#fff;background:#f43f5e;padding:1px 5px;border-radius:99px;
+  }
+
+  /* ===== 公告 ===== */
+  .notice p{font-size:16px;line-height:2;font-weight:600;color:#26282d;letter-spacing:.2px}
+  .notice p + p{margin-top:4px}
+  .notice .red{color:#e11d48}
+  .notice .small{font-size:12.5px;font-weight:400;color:var(--dim);margin-top:16px;line-height:1.85}
+
+  /* ===== 页脚 ===== */
+  .foot{
+    margin-top:18px;text-align:center;font-size:11px;color:var(--dim2);line-height:1.9;
+  }
+  .foot b{color:var(--dim);font-weight:500}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <span class="logo" aria-hidden="true">
+      <svg viewBox="0 0 128 128">
+        <defs><linearGradient id="g1" x2=".2" y2="1"><stop stop-color="#ffefc3"/><stop offset="1" stop-color="#bc8434"/></linearGradient></defs>
+        <ellipse cx="64" cy="66" rx="49" ry="21" transform="rotate(-31 64 66)" fill="none" stroke="#ad935f" stroke-opacity=".59" stroke-width="1.6"/>
+        <g fill="url(#g1)"><polygon points="26,30 41,30 64,79 81,42 96,42 71,96 58,96"/><path d="M92 15 94.8 23.2 103 26 94.8 28.8 92 37 89.2 28.8 81 26 89.2 23.2Z"/></g>
+      </svg>
+    </span>
+    <h1>总站链接</h1>
+    <span class="tag">实时更新</span>
+    <span class="spacer"></span>
+    <button class="copy-btn" id="copyBtn">复制本站</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <section class="hero">
+    <h2>收集全网最全资源<br>想要什么都有，没有的反馈帮找</h2>
+    <p>站内资源均采集于网络，所有链接都指向网盘，仅用于交流学习，其版权归版权方所有，如有侵权请联系删除。<br>联系方式：QQ 群 1125266288　推荐手机端保存到自己网盘，不然可能会有「报错」「中断」等情况。</p>
+    <span class="more">更多说明</span>
+  </section>
+
+  <section class="card">
+    <h3>操作入口</h3>
+    <div class="grid">
+      <a class="entry" href="https://viktorx.com/" target="_blank" rel="noopener">
+        <span class="rec">推荐</span>
+        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg></span>
+        <span class="lb">影视站<br>【推荐】</span>
+      </a>
+      <a class="entry" href="https://viktorx.com/" target="_blank" rel="noopener">
+        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg></span>
+        <span class="lb">游戏+软件<br>+DLC</span>
+      </a>
+      <a class="entry" href="https://pan.quark.cn/s/3453b4fa25f6" target="_blank" rel="noopener">
+        <span class="ico p"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span>
+        <span class="lb">点我送<br>1T空间</span>
+      </a>
+      <a class="entry" href="https://qun.qq.com/universal-share/share?ac=1&amp;authKey=I0ySQJ%2B2UJ%2Fio28LDE7S4uiKgHlUNdgLBFoW6riJGxKkt2W9U14VO78K0zIR4N6f&amp;busi_data=eyJncm91cENvZGUiOiIxMTI1MjY2Mjg4IiwidG9rZW4iOiI1TXJMTUdpeDRPZmxXTTlyWERlTGlIdGU5cHo2clRMZS9vMlJWcU96a2w1aWVlT0NRSkVLR1A3NkdTMDR4cHBFIiwidWluIjoiMjE4NzE3MTYxMSJ9&amp;data=KP55jhyOXE_pi6vJEUgj35WCVs3827qCPSg58b1UzM0RB4G_p_Fb3qNuXT_KQ9Jd00mWAV_AHxGvouMfsXzAdQ&amp;svctype=4&amp;tempid=h5_group_info" target="_blank" rel="noopener">
+        <span class="ico b"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12.6c0 3.5-3.6 6.3-8 6.3a9.7 9.7 0 0 1-2.6-.35L5 20.5l.8-3.1A6 6 0 0 1 4 12.6C4 9.1 7.6 6.3 12 6.3s8 2.8 8 6.3z"/><path d="M9 12.4h.01M12 12.4h.01M15 12.4h.01"/></svg></span>
+        <span class="lb">跟站长聊<br>进群</span>
+      </a>
+      <a class="entry" href="https://pan.quark.cn/s/3453b4fa25f6" target="_blank" rel="noopener">
+        <span class="ico g"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.6 6.1.8-4.5 4.2 1.2 6L12 16.8 6.6 19.6l1.2-6L3.3 9.4l6.1-.8z"/></svg></span>
+        <span class="lb">赞助支持</span>
+      </a>
+    </div>
+  </section>
+
+  <section class="card notice">
+    <h3>公告</h3>
+    <p>新用户 手机端下载<span class="red">送会员+1T空间</span></p>
+    <p>推荐手机端保存后再下载<br>（预防「报错」「中断」等问题）</p>
+    <p>建议保存总站，防止丢失</p>
+    <p class="small">本站不存储任何文件，所有内容均来自第三方网盘分享。若链接失效，请到群里反馈，站长会尽快补链。</p>
+    <div style="height:12px"></div>
+  </section>
+
+  <div class="foot">
+    维克托的星隐 · 总站链接<br>
+    <b>建议添加到主屏幕，防止走丢</b>
+  </div>
+
+</div>
+
+<script>
+/* 复制当前地址（把渠道码去掉，给别人干净的入口） */
+document.getElementById('copyBtn').addEventListener('click', function () {
+  var u = location.origin + location.pathname;
+  var done = function () {
+    var b = document.getElementById('copyBtn');
+    var t = b.textContent;
+    b.textContent = '已复制';
+    setTimeout(function () { b.textContent = t; }, 1400);
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(u).then(done, done);
+  } else {
+    var ta = document.createElement('textarea');
+    ta.value = u; document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta); done();
+  }
+});
+
+/* 渠道码透传：?S800 / ?from=xxx 带到所有出口（跳过带签名的 QQ 链接） */
+(function () {
+  var q = new URLSearchParams(location.search);
+  var from = q.get('from') || q.get('ch') || q.get('S') || q.get('s');
+  if (!from) {
+    q.forEach(function (v, k) { if (!from && /^[Ss][0-9A-Za-z]{1,12}$/.test(k)) from = k.slice(1); });
+  }
+  if (!from) return;
+  document.querySelectorAll('a.entry').forEach(function (a) {
+    var raw = a.getAttribute('href') || '';
+    if (!/^https?:/i.test(raw)) return;
+    if (/qun\.qq\.com|qm\.qq\.com/i.test(raw)) return;
+    try {
+      var u = new URL(raw, location.href);
+      u.searchParams.set('from', from);
+      a.setAttribute('href', u.href);
+    } catch (e) {}
+  });
+})();
+</script>
+</body>
+</html>

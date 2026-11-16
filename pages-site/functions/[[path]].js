@@ -27,6 +27,9 @@ const TABLE = {
   pan:   BASE + '?ch=pan',
 };
 
+// clean URL 的静态页面（Pages 会把 /hub.html 重定向到 /hub）
+const STATIC_PAGES = new Set(['hub']);
+
 // ---------- 工具 ----------
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -153,8 +156,11 @@ export const onRequest = async (ctx) => {
     return ctx.next();
   }
 
-  // 静态资源优先
+  // 静态资源优先（带扩展名）
   if (/\.[a-z0-9]{2,5}$/i.test(code)) return ctx.next();
+
+  // clean URL 的静态页面白名单（Pages 会把 /hub.html 308 到 /hub，这里要放行）
+  if (STATIC_PAGES.has(code.toLowerCase())) return ctx.next();
 
   return notFound();
 };
