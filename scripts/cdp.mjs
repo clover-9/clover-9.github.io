@@ -69,6 +69,19 @@ try {
     });
     if (exceptionDetails) { console.error('EXCEPTION', JSON.stringify(exceptionDetails.exception?.description || exceptionDetails)); process.exitCode = 1; }
     else console.log(typeof result.value === 'string' ? result.value : JSON.stringify(result.value, null, 2));
+  } else if (cmd === 'pdf') {
+    // node cdp.mjs pdf <out.pdf> [paperWidthInch] [paperHeightInch]
+    const [out, w, h] = rest;
+    const { data } = await c.send('Page.printToPDF', {
+      printBackground: true,
+      displayHeaderFooter: false,
+      preferCSSPageSize: true,
+      paperWidth: Number(w || 4.06),
+      paperHeight: Number(h || 11.8),
+      marginTop: 0, marginBottom: 0, marginLeft: 0, marginRight: 0,
+    });
+    fs.writeFileSync(out, Buffer.from(data, 'base64'));
+    console.log('saved ' + out + ' (' + Math.round(fs.statSync(out).size / 1024) + ' KB)');
   } else if (cmd === 'wait') {
     await sleep(Number(rest[0] || 2000));
     console.log('waited');
